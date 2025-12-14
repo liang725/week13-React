@@ -4,9 +4,7 @@ import AddQuestion from './AddQuestion';
 
 const { Search } = Input;
 
-const onSearch = (value) => console.log(value);
-
-const SearchQuestion = () => {
+const SearchQuestion = ({ onSearch }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const showModal = () => {
@@ -30,7 +28,7 @@ const SearchQuestion = () => {
           allowClear
           enterButton="查询题目"
           size="large"
-          onSearch={onSearch}
+          onSearch={(value) => onSearch && onSearch(value)}
         />
         <Button type="primary" onClick={showModal}>
           添加题目

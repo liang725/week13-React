@@ -11,6 +11,8 @@ const { Header, Footer, Sider, Content } = Layout;
 
 const App = () => {
   const [selectedKey, setSelectedKey] = useState('1');
+  const [userSearchKeyword, setUserSearchKeyword] = useState('');
+  const [questionSearchKeyword, setQuestionSearchKeyword] = useState('');
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -33,14 +35,14 @@ const App = () => {
         <Content style={{ padding: '16px' }}>
           {selectedKey === '1' && (
             <>
-              <SearchUser />
-              <UserTable />
+              <SearchUser onSearch={setUserSearchKeyword} />
+              <UserTable searchKeyword={userSearchKeyword} />
             </>
           )}
           {selectedKey === '2' && (
             <>
-              <SearchQuestion />
-              <QuestionTable />
+              <SearchQuestion onSearch={setQuestionSearchKeyword} />
+              <QuestionTable searchKeyword={questionSearchKeyword} />
             </>
           )}
         </Content>

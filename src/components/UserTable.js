@@ -1,8 +1,8 @@
-import { Space, Table, Button, message } from 'antd';
+import { Space, Table, Button, message, Modal, Form, Input } from 'antd';
 import { CalendarOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 
-const columns = [
+const getColumns = (handleEdit) => [
     {
         title: '日期',
         dataIndex: 'date',
@@ -33,10 +33,7 @@ const columns = [
                 <Button 
                     type="link" 
                     size="small" 
-                    onClick={() => {
-                        message.info('点击编辑');
-                        console.log('编辑用户', record);
-                    }}
+                    onClick={() => handleEdit(record)}
                 >
                     编辑
                 </Button>
@@ -116,24 +113,35 @@ const mockUsers = [
     }
 ];
 
-const UserTable = () => {
+const UserTable = ({ searchKeyword }) => {
     const [data, setData] = useState([]);
     const [pagination, setPagination] = useState({
         current: 1,
         pageSize: 5,
         total: 100,
         showSizeChanger: false,
+        showQuickJumper: false,
         position: ['bottomLeft'],
     });
     const [loading, setLoading] = useState(false);
+    const [editModalVisible, setEditModalVisible] = useState(false);
+    const [editingRecord, setEditingRecord] = useState(null);
+    const [form] = Form.useForm();
 
     const fetchData = (page = 1, pageSize = 5) => {
         setLoading(true);
     
         setTimeout(() => {
+            // 根据搜索关键词过滤数据
+            const filteredUsers = searchKeyword 
+                ? mockUsers.filter(user => 
+                    user.name.toLowerCase().includes(searchKeyword.toLowerCase())
+                  )
+                : mockUsers;
+            
             const startIndex = (page - 1) * pageSize;
             const endIndex = startIndex + pageSize;
-            const pageData = mockUsers.slice(startIndex, endIndex);
+            const pageData = filteredUsers.slice(startIndex, endIndex);
             
             setData(pageData.map((item) => ({
                 key: item.key,
@@ -147,7 +155,7 @@ const UserTable = () => {
                 ...prev,
                 current: page,
                 pageSize: pageSize,
-                total: 100,
+                total: filteredUsers.length,
             }));
             
             setLoading(false);
@@ -156,20 +164,82 @@ const UserTable = () => {
 
     useEffect(() => {
         fetchData(1, 5);
-    }, []);
+    }, [searchKeyword]);
 
     const handleTableChange = (pag) => {
         fetchData(pag.current, pag.pageSize);
     };
 
+    const handleEdit = (record) => {
+        setEditingRecord(record);
+        form.setFieldsValue({
+            name: record.name,
+            password: record.password,
+        });
+        setEditModalVisible(true);
+    };
+
+    const handleEditSubmit = () => {
+        form.validateFields().then(values => {
+            console.log('编辑用户数据:', values);
+            // 这里可以调用API更新用户
+            message.success('用户更新成功！');
+            setEditModalVisible(false);
+            form.resetFields();
+        }).catch(info => {
+            console.log('验证失败:', info);
+        });
+    };
+
+    const handleEditCancel = () => {
+        setEditModalVisible(false);
+        form.resetFields();
+    };
+
     return (
-        <Table
-            columns={columns}
-            dataSource={data}
-            pagination={pagination}
-            loading={loading}
-            onChange={handleTableChange}
-        />
+        <>
+            <Table
+                columns={getColumns(handleEdit)}
+                dataSource={data}
+                pagination={pagination}
+                loading={loading}
+                onChange={handleTableChange}
+            />
+            
+            <Modal
+                title="编辑用户"
+                open={editModalVisible}
+                onOk={handleEditSubmit}
+                onCancel={handleEditCancel}
+                width={500}
+                okText="保存"
+                cancelText="取消"
+            >
+                <Form
+                    form={form}
+                    layout="vertical"
+                    style={{ marginTop: 20 }}
+                >
+                    <Form.Item
+                        name="name"
+                        label="用户名"
+                        rules={[{ required: true, message: '请输入用户名！' }]}
+                    >
+                        <Input placeholder="请输入用户名" />
+                    </Form.Item>
+
+                    <Form.Item
+                        name="password"
+                        label="密码"
+                        rules={[{ required: true, message: '请输入密码！' }]}
+                    >
+                        <Input.Password placeholder="请输入密码" />
+                    </Form.Item>
+
+
+                </Form>
+            </Modal>
+        </>
     );
 };
 

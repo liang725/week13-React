@@ -4,9 +4,7 @@ import AddUser from './AddUser';
 
 const { Search } = Input;
 
-const onSearch = (value) => console.log(value);
-
-const SearchUser = () => {
+const SearchUser = ({ onSearch }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const showModal = () => {
@@ -30,7 +28,7 @@ const SearchUser = () => {
           allowClear
           enterButton="查询用户"
           size="large"
-          onSearch={onSearch}
+          onSearch={(value) => onSearch && onSearch(value)}
         />
         <Button type="primary" onClick={showModal}>
           添加用户
