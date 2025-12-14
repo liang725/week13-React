@@ -242,9 +242,7 @@ const allData = [
     }
 ];
 
-const onChange = (pagination, filters, sorter, extra) => {
-    console.log('params', pagination, filters, sorter, extra);
-};
+
 
 const QuestionTable = ({ searchKeyword }) => {
     const [currentPage, setCurrentPage] = useState(1);

@@ -34,10 +34,7 @@ const AddQuestion = ({ onSuccess }) => {
     paddingRight: '12px'
   };
 
-  const requiredLabelStyle = {
-    ...labelStyle,
-    position: 'relative'
-  };
+
 
   const Label = ({ children }) => (
     <span style={labelStyle}>
